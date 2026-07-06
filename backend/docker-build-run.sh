@@ -1,5 +1,10 @@
 #!/bin/bash
 
+#!/bin/bash
+
+# create image called 'faraja-backend'
+docker build faraja-backend .
+
 # copy environment variables
 cp .env.example .env
 
