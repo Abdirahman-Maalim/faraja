@@ -1,0 +1,7 @@
+# git files
+.git
+.gitignore
+
+# environment variable files
+.env
+.env.*
