@@ -10,7 +10,7 @@ The three tiers communicate through dedicated Docker bridge networks, ensuring t
 
 # Architecture Diagram
 
-> *(insert diagram here)*
+![](https://github.com/Abdirahman-Maalim/faraja/blob/docs/architecture/docs/architecture.jpeg)
 
 ---
 
