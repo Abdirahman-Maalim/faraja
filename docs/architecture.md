@@ -247,8 +247,6 @@ The current implementation represents the containerization phase of the cloud-na
 Future phases of the capstone project will extend this architecture by introducing:
 
 * Kubernetes for container orchestration
-* Helm for application packaging
-* RBAC and security hardening
 * Prometheus for metrics collection
 * Grafana for visualization and monitoring
 * GitOps workflows using Argo CD
