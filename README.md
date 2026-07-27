@@ -118,6 +118,6 @@ App URLs:
 
 
 ## Team Members
-- [Abdirahman Maalim]((https://www.github.com/Abdirahman-Maalim))
+- [Abdirahman Maalim](https://www.github.com/Abdirahman-Maalim)
 - [Eva Muthoni](https://www.github.com/teqeva)
 - [Karen Ngugi](https://www.github.com/KarenNgugi)
