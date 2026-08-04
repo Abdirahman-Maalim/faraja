@@ -7,16 +7,21 @@ LABEL version="1.0.0"
 
 WORKDIR /app
 
-# Copy package files first (for caching)
 COPY package*.json ./
 
-# Install dependencies with cache optimization
-RUN npm ci --no-cache
+RUN npm config set fetch-retries 5 && \
+    npm config set fetch-retry-mintimeout 20000 && \
+    npm config set fetch-retry-maxtimeout 120000 && \
+    npm config set fetch-timeout 300000
 
-# Copy source code
+RUN npm ci
+
 COPY . .
 
-# Build the application
+# Accept the API base URL at build time so it's baked into client-side JS
+ARG NEXT_PUBLIC_API_BASE_URL
+ENV NEXT_PUBLIC_API_BASE_URL=$NEXT_PUBLIC_API_BASE_URL
+
 RUN npm run build
 
 # STAGE 2: Runner (Production)
@@ -31,30 +36,24 @@ WORKDIR /app
 # Install curl for healthcheck
 RUN apk add --no-cache curl
 
-# Set environment variables
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 
-# Create non-root user (Alpine uses -G for group)
+# Create non-root user
 RUN addgroup --system --gid 1001 nodejs && \
     adduser --system --uid 1001 -G nodejs nextjs
 
-# Copy built assets from builder
+# Copy built app AND node_modules directly from builder (prevents 2nd npm ci hang)
 COPY --from=builder --chown=nextjs:nodejs /app/.next ./.next
+COPY --from=builder --chown=nextjs:nodejs /app/node_modules ./node_modules
 COPY --from=builder --chown=nextjs:nodejs /app/package*.json ./
 
-# Install production dependencies only
-RUN npm ci --omit=dev --no-cache
-
-# Switch to non-root user
 USER nextjs
 
-# Expose port (Next.js default port)
-EXPOSE 3000
+EXPOSE 3001
 
-# Healthcheck using curl (more reliable)
+# Healthcheck targeted at port 3001 (matches "start": "next start -p 3001")
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
-  CMD curl -f http://localhost:3000 || exit 1
+  CMD curl -f http://localhost:3001 || exit 1
 
-# Start the application
 CMD ["npm", "start"]

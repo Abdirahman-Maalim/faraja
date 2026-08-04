@@ -29,7 +29,6 @@ services:
     env_file:
       - .env
     environment:
-      # Inside the compose network, "db" is the hostname (the .env value
       DATABASE_URL: postgresql+psycopg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
     ports:
       - "${BACKEND_PORT:-8000}:8000"
@@ -37,8 +36,6 @@ services:
       db:
         condition: service_healthy
     healthcheck:
-      # No curl in the python:3.12-slim image, so we hit FastAPI's own
-      # /health route with the stdlib instead.
       test: ["CMD", "python3", "-c", "import urllib.request as u; u.urlopen('http://localhost:8000/health', timeout=3)"]
       interval: 10s
       timeout: 5s
@@ -50,19 +47,19 @@ services:
   frontend:
     build:
       context: ./frontend
+      args:
+        # Pulled from .env (per-machine, gitignored). Falls back to
+        # localhost if unset, which works for anyone running Docker
+        # Desktop or accessing via the same host as the browser.
+        NEXT_PUBLIC_API_BASE_URL: ${NEXT_PUBLIC_API_BASE_URL:-http://localhost:8000}
     image: faraja-frontend:latest
     container_name: faraja-frontend
     restart: unless-stopped
     environment:
-      # api.ts reads this via globalThis.process at runtime for
-      # server-side (SSR) fetches, so it must point at the backend's
-      # service name, not localhost. Client-side ("use client") fetches
-      # fall back to the hardcoded 127.0.0.1:8000 default in the code,
-      # which works because BACKEND_PORT is published to the host below.
+      # Server-side (SSR) fetches happen inside the Docker network, so
+      # they use the service name "backend", not localhost or an IP.
       NEXT_PUBLIC_API_BASE_URL: http://backend:8000
     ports:
-      # package.json's start script is "next start -p 3001", so the
-      # containery listens on 3001, NOT the 3000 that EXPOSE.
       - "${FRONTEND_PORT:-3001}:3001"
     depends_on:
       - backend
