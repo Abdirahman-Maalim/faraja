@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: postgres
+  name: faraja-db-sts
   namespace: faraja-ns
   labels:
     app: postgres
@@ -28,7 +28,7 @@ spec:
         project: faraja
     spec:
       containers:
-        - name: postgres
+        - name: faraja-db
           image: postgres:15-alpine
           ports:
             - name: postgres
@@ -87,7 +87,7 @@ spec:
       volumes:
         - name: postgres-storage
           persistentVolumeClaim:
-            claimName: postgres-pvc   # must match persistentvolumeclaim.yaml
+            claimName: faraja-pvc   # must match persistentvolumeclaim.yaml
         - name: init-sql
           configMap:
             name: postgres-initdb-config
