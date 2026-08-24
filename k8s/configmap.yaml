@@ -16,3 +16,44 @@ data:
   DB_USER: postgres
   API_PORT: "8000"
   NEXT_PUBLIC_API_BASE_URL: http://backend:8000
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: backend-configmap
+  labels:
+    app: faraja
+data:
+  DATABASE_URL: postgresql+psycopg://postgres:postgres@postgres:5432/faraja 
+  FRONTEND_ORIGIN: http://192.168.49.2:30001
+
+---
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: db-configmap
+  labels:
+    app: faraja
+    tier: database
+data:
+  POSTGRES_USER: "postgres"
+  POSTGRES_PASSWORD: "postgres"
+  POSTGRES_DB: "faraja"
+  POSTGRES_PORT: "5432"
+  BACKEND_PORT: "8000"
+  FRONTEND_PORT: "3001"
+  NEXT_PUBLIC_API_BASE_URL: "http://faraja-backend-svc:8000" 
+
+---
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: frontend-configmap
+  labels:
+    app: faraja
+data:
+  API_INTERNAL_URL: http://faraja-backend-svc:8000 
+  NEXT_PUBLIC_API_BASE_URL: http://192.168.49.2:32767
