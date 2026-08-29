@@ -22,10 +22,11 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: backend-configmap
+  namespace: faraja-ns
   labels:
     app: faraja
 data:
-  DATABASE_URL: postgresql+psycopg://postgres:postgres@postgres:5432/faraja 
+  DATABASE_URL: postgresql+psycopg://postgres:postgres@faraja-db-svc:5432/faraja 
   FRONTEND_ORIGIN: http://192.168.49.2:30001
 
 ---
@@ -34,6 +35,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: db-configmap
+  namespace: faraja-ns
   labels:
     app: faraja
     tier: database
@@ -52,6 +54,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: frontend-configmap
+  namespace: faraja-ns
   labels:
     app: faraja
 data:
