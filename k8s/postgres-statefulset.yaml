@@ -29,7 +29,7 @@ spec:
     spec:
       containers:
         - name: faraja-db
-          image: postgres:15-alpine
+          image: postgres:16-alpine
           ports:
             - name: postgres
               containerPort: 5432
@@ -54,22 +54,19 @@ spec:
           volumeMounts:
             - name: postgres-storage
               mountPath: /var/lib/postgresql/data
-            - name: init-sql
-              mountPath: /docker-entrypoint-initdb.d
-              readOnly: true
           resources:
             requests:
-              cpu: "250m"
-              memory: "256Mi"
+              cpu: "50m"
+              memory: "128Mi"
             limits:
-              cpu: "500m"
-              memory: "512Mi"
+              cpu: "50m"
+              memory: "128Mi"
           readinessProbe:
             exec:
               command:
                 - sh
                 - -c
-                - pg_isready -U $(POSTGRES_USER) -d $(POSTGRES_DB)
+                - pg_isready -U $POSTGRES_USER -d $POSTGRES_DB
             initialDelaySeconds: 10
             periodSeconds: 5
             timeoutSeconds: 5
@@ -79,7 +76,7 @@ spec:
               command:
                 - sh
                 - -c
-                - pg_isready -U $(POSTGRES_USER) -d $(POSTGRES_DB)
+                - pg_isready -U $POSTGRES_USER -d $POSTGRES_DB
             initialDelaySeconds: 15
             periodSeconds: 10
             timeoutSeconds: 5
@@ -88,6 +85,3 @@ spec:
         - name: postgres-storage
           persistentVolumeClaim:
             claimName: faraja-pvc   # must match persistentvolumeclaim.yaml
-        - name: init-sql
-          configMap:
-            name: postgres-initdb-config
