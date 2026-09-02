@@ -1,0 +1,43 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: faraja-config
+  namespace: faraja-ns
+  labels:
+    team: cne01
+    environment: development
+    project: faraja
+    app: faraja
+data:
+  APP_ENV: development
+  DB_HOST: faraja-db-svc
+  DB_PORT: "5432"
+  DB_NAME: faraja
+  DB_USER: postgres
+  API_PORT: "8000"
+  NEXT_PUBLIC_API_BASE_URL: http://backend:8000
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: backend-configmap
+  namespace: faraja-ns
+  labels:
+    app: faraja
+data:
+  DATABASE_URL: postgresql+psycopg://postgres:postgres@faraja-db-svc:5432/faraja 
+  FRONTEND_ORIGIN: http://192.168.49.2:30001
+
+---
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: frontend-configmap
+  namespace: faraja-ns
+  labels:
+    app: faraja
+data:
+  API_INTERNAL_URL: http://faraja-backend-svc:8000 
+  NEXT_PUBLIC_API_BASE_URL: http://192.168.49.2:32767

@@ -16,3 +16,4 @@ backend/.mypy_cache
 # OS / editor
 .DS_Store
 .vscode/*.log
+.env
