@@ -4,3 +4,5 @@ sqlmodel==0.0.22
 psycopg[binary]==3.2.3
 python-dotenv==1.0.1
 pydantic-settings==2.6.1
+prometheus-fastapi-instrumentator==7.0.0
+prometheus-client==0.20
