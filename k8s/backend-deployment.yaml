@@ -1,0 +1,76 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: faraja-backend-deployment
+  namespace: faraja-ns
+  labels:
+    app: faraja
+spec:
+  replicas: 3
+
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+
+  selector:
+    matchLabels:
+      app: faraja
+
+  template:
+    metadata:
+      labels:
+        app: faraja
+
+    spec:
+      containers:
+      - name: backend
+        image: faraja-backend:latest
+        imagePullPolicy: Never
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "0.5"
+          limits:
+            memory: "128Mi"
+            cpu: "1"
+        ports:
+        - containerPort: 8000
+          name: backend-port
+        env:
+        - name: DATABASE_URL
+          valueFrom:
+            configMapKeyRef:
+              key: DATABASE_URL
+              name: backend-configmap
+        - name: FRONTEND_ORIGIN
+          valueFrom:
+            configMapKeyRef:
+              key: FRONTEND_ORIGIN
+              name: backend-configmap
+        - name: DB_HOST
+          valueFrom:
+            configMapKeyRef:
+              key: DB_HOST
+              name: faraja-config
+        - name: DB_PORT
+          valueFrom:
+            configMapKeyRef:
+              key: DB_PORT
+              name: faraja-config
+        - name: DB_NAME
+          valueFrom:
+            configMapKeyRef:
+              key: DB_NAME
+              name: faraja-config
+        - name: DB_USER
+          valueFrom:
+            configMapKeyRef:
+              key: DB_USER
+              name: faraja-config
+        - name: API_PORT
+          valueFrom:
+            configMapKeyRef:
+              key: API_PORT
+              name: faraja-config

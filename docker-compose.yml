@@ -1,0 +1,76 @@
+services:
+  db:
+    build:
+      context: ./database
+    image: faraja-db:latest
+    container_name: faraja-db
+    restart: unless-stopped
+    env_file:
+      - .env
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - faraja-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - faraja-net
+
+  backend:
+    build:
+      context: ./backend
+    image: faraja-backend:latest
+    container_name: faraja-backend
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+    ports:
+      - "${BACKEND_PORT:-8000}:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python3", "-c", "import urllib.request as u; u.urlopen('http://localhost:8000/health', timeout=3)"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - faraja-net
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        # Pulled from .env (per-machine, gitignored). Falls back to
+        # localhost if unset, which works for anyone running Docker
+        # Desktop or accessing via the same host as the browser.
+        NEXT_PUBLIC_API_BASE_URL: ${NEXT_PUBLIC_API_BASE_URL:-http://localhost:8000}
+    image: faraja-frontend:latest
+    container_name: faraja-frontend
+    restart: unless-stopped
+    environment:
+      # Server-side (SSR) fetches happen inside the Docker network, so
+      # they use the service name "backend", not localhost or an IP.
+      NEXT_PUBLIC_API_BASE_URL: http://backend:8000
+    ports:
+      - "${FRONTEND_PORT:-3001}:3001"
+    depends_on:
+      - backend
+    networks:
+      - faraja-net
+
+volumes:
+  faraja-db-data:
+    name: faraja-db-data
+
+networks:
+  faraja-net:
+    name: faraja-net
+    driver: bridge
