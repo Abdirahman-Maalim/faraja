@@ -7,7 +7,7 @@ spec:
   project: default
   source:
     repoURL: https://github.com/Abdirahman-Maalim/faraja.git
-    targetRevision: main
+    targetRevision: Developer
     path: k8s
   destination:
     server: https://kubernetes.default.svc
