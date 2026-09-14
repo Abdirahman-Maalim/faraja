@@ -161,7 +161,7 @@ spec:
             kube_horizontalpodautoscaler_status_current_replicas{namespace="faraja-ns"}
             == kube_horizontalpodautoscaler_spec_max_replicas{namespace="faraja-ns"}
           for: 15m
-          labels:
+          labels:  
             severity: warning
             team: backend
           annotations:

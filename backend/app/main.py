@@ -20,7 +20,7 @@ allowed_origins = [
     origin.strip()
     for origin in settings.frontend_origin.split(",")
     if origin.strip()
-]
+] 
 
 app.add_middleware(
     CORSMiddleware,
