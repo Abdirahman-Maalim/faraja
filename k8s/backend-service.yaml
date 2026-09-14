@@ -10,6 +10,7 @@ spec:
     app: faraja
   type: NodePort
   ports:
-  - port: 8000
+  - name: http
+    port: 8000
     targetPort: backend-port
     nodePort: 32767

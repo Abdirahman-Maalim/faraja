@@ -4,7 +4,7 @@ metadata:
   name: faraja-alerts
   namespace: monitoring
   labels:
-    release: monitoring
+    release: prometheus
 spec:
   groups:
     - name: faraja.golden-signals
@@ -20,7 +20,7 @@ spec:
           annotations:
             summary: "Faraja API error rate above 1%"
             description: "Namespace faraja-ns: {{ $value | humanize }}% of requests are 5xx. Impact: users may be seeing failed requests."
-            runbook_url: "https://github.com/teqeva/Faraja/blob/main/docs/runbooks/high-error-rate.md"
+            runbook_url: "https://github.com/Abdirahman-Maalim/faraja/blob/main/docs/runbooks/high-error-rate.md"
 
         - alert: FarajaHighLatency
           expr: |
@@ -34,7 +34,7 @@ spec:
           annotations:
             summary: "Faraja API P95 latency above 500ms"
             description: "Namespace faraja-ns: P95 latency is {{ $value | humanizeDuration }}. Impact: slow responses for users."
-            runbook_url: "https://github.com/teqeva/Faraja/blob/main/docs/runbooks/high-latency.md"
+            runbook_url: "https://github.com/Abdirahman-Maalim/faraja/blob/main/docs/runbooks/high-latency.md"
 
     - name: faraja.resources
       rules:
@@ -48,7 +48,7 @@ spec:
           annotations:
             summary: "Faraja container was OOMKilled"
             description: "Pod {{ $labels.pod }} container {{ $labels.container }} in faraja-ns was killed for exceeding memory limit. Impact: pod restarted, possible dropped requests."
-            runbook_url: "https://github.com/teqeva/Faraja/blob/main/docs/runbooks/oom-killed.md"
+            runbook_url: "https://github.com/Abdirahman-Maalim/faraja/blob/main/docs/runbooks/oom-killed.md"
 
         - alert: FarajaHighMemoryUsage
           expr: |
@@ -62,7 +62,7 @@ spec:
           annotations:
             summary: "Faraja pod memory usage above 90% of limit"
             description: "Pod {{ $labels.pod }} in faraja-ns is at {{ $value | humanize }}% of its memory limit. Impact: risk of imminent OOMKill."
-            runbook_url: "https://github.com/teqeva/Faraja/blob/main/docs/runbooks/high-memory.md"
+            runbook_url: "https://github.com/Abdirahman-Maalim/faraja/blob/main/docs/runbooks/high-memory.md"
 
         - alert: FarajaPodRestartingFrequently
           expr: |
@@ -74,7 +74,7 @@ spec:
           annotations:
             summary: "Faraja pod restarting frequently"
             description: "Pod {{ $labels.pod }} in faraja-ns has restarted more than 3 times in 30 minutes. Impact: possible crash loop, degraded availability."
-            runbook_url: "https://github.com/teqeva/Faraja/blob/main/docs/runbooks/frequent-restarts.md"
+            runbook_url: "https://github.com/Abdirahman-Maalim/faraja/blob/main/docs/runbooks/frequent-restarts.md"
 
         - alert: FarajaPodNotReady
           expr: |
@@ -86,7 +86,7 @@ spec:
           annotations:
             summary: "Faraja pod is not ready"
             description: "Pod {{ $labels.pod }} in namespace {{ $labels.namespace }} has been NotReady for more than 5 minutes."
-            runbook_url: "https://github.com/teqeva/Faraja/blob/main/docs/runbooks/pod-not-ready.md"
+            runbook_url: "https://github.com/Abdirahman-Maalim/faraja/blob/main/docs/runbooks/pod-not-ready.md"
 
     - name: faraja.cluster
       rules:
@@ -100,7 +100,7 @@ spec:
           annotations:
             summary: "Node {{ $labels.node }} is down"
             description: "Node {{ $labels.node }} is NotReady or unreachable."
-            runbook_url: "https://github.com/teqeva/Faraja/blob/main/docs/runbooks/node-down.md"
+            runbook_url: "https://github.com/Abdirahman-Maalim/faraja/blob/main/docs/runbooks/node-down.md"
         - alert: FarajaPVCPending
           expr: |
             kube_persistentvolumeclaim_status_phase{namespace="faraja-ns", phase="Pending"} == 1
@@ -111,7 +111,7 @@ spec:
           annotations:
             summary: "PVC {{ $labels.persistentvolumeclaim }} is pending"
             description: "PVC {{ $labels.persistentvolumeclaim }} in faraja-ns has been Pending for 5+ minutes. Impact: dependent pod cannot start."
-            runbook_url: "https://github.com/teqeva/Faraja/blob/main/docs/runbooks/pvc-pending.md"
+            runbook_url: "https://github.com/Abdirahman-Maalim/faraja/blob/main/docs/runbooks/pvc-pending.md"
 
         - alert: FarajaTrafficDrop
           expr: |
@@ -127,7 +127,7 @@ spec:
           annotations:
             summary: "Faraja traffic dropped over 50%"
             description: "Request rate is {{ $value | humanize }}% of last week's rate at this time. Impact: possible outage or upstream issue."
-            runbook_url: "https://github.com/teqeva/Faraja/blob/main/docs/runbooks/traffic-drop.md"
+            runbook_url: "https://github.com/Abdirahman-Maalim/faraja/blob/main/docs/runbooks/traffic-drop.md"
 
         - alert: FarajaCPUThrottlingHigh
           expr: |
@@ -140,7 +140,7 @@ spec:
           annotations:
             summary: "Faraja container CPU throttled above 25%"
             description: "Container {{ $labels.container }} in pod {{ $labels.pod }} is being throttled at {{ $value | humanize }}%. Impact: degraded performance under load."
-            runbook_url: "https://github.com/teqeva/Faraja/blob/main/docs/runbooks/cpu-throttling.md"
+            runbook_url: "https://github.com/Abdirahman-Maalim/faraja/blob/main/docs/runbooks/cpu-throttling.md"
 
         - alert: FarajaHighCPUUsage
           expr: |
@@ -154,7 +154,7 @@ spec:
           annotations:
             summary: "Faraja pod CPU usage above 90% of limit"
             description: "Pod {{ $labels.pod }} in faraja-ns is at {{ $value | humanize }}% of its CPU limit for 15+ minutes. Impact: risk of throttling, degraded response times."
-            runbook_url: "https://github.com/teqeva/Faraja/blob/main/docs/runbooks/high-cpu-usage.md"
+            runbook_url: "https://github.com/Abdirahman-Maalim/faraja/blob/main/docs/runbooks/high-cpu-usage.md"
 
         - alert: FarajaHPAMaxReplicas
           expr: |
@@ -167,7 +167,7 @@ spec:
           annotations:
             summary: "HPA {{ $labels.horizontalpodautoscaler }} at max replicas"
             description: "HPA has been at its max replica count for 15+ minutes. Impact: cannot scale further to absorb more load."
-            runbook_url: "https://github.com/teqeva/Faraja/blob/main/docs/runbooks/hpa-max-replicas.md"
+            runbook_url: "https://github.com/Abdirahman-Maalim/faraja/blob/main/docs/runbooks/hpa-max-replicas.md"
         - alert: CoreDNSDown
           expr: |
             kube_deployment_status_replicas_available{deployment="coredns", namespace="kube-system"} == 0
@@ -178,4 +178,4 @@ spec:
           annotations:
             summary: "CoreDNS is down"
             description: "CoreDNS has zero available replicas. Impact: all in-cluster service discovery fails — pods cannot resolve Service names, breaking backend-to-database and frontend-to-backend communication."
-            runbook_url: "https://github.com/teqeva/Faraja/blob/main/docs/runbooks/coredns-down.md"
+            runbook_url: "https://github.com/Abdirahman-Maalim/faraja/blob/main/docs/runbooks/coredns-down.md"
