@@ -56,21 +56,21 @@ spec:
               mountPath: /var/lib/postgresql/data
           resources:
             requests:
-              cpu: "50m"
-              memory: "128Mi"
+              cpu: "250m"
+              memory: "256Mi"
             limits:
-              cpu: "50m"
-              memory: "128Mi"
+              cpu: "500m"
+              memory: "512Mi"
           readinessProbe:
             exec:
               command:
                 - sh
                 - -c
                 - pg_isready -U $POSTGRES_USER -d $POSTGRES_DB
-            initialDelaySeconds: 10
-            periodSeconds: 5
-            timeoutSeconds: 5
-            failureThreshold: 5
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 10
+            failureThreshold: 15
           livenessProbe:
             exec:
               command:
