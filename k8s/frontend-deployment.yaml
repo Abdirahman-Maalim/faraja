@@ -24,7 +24,7 @@ spec:
     spec:
       containers:
       - name: frontend
-        image: teqiee/faraja-frontend:latest
+        image: teqiee/faraja-frontend:typo
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 3001
