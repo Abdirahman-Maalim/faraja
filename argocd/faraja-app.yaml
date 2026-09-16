@@ -8,7 +8,7 @@ spec:
   source:
     repoURL: https://github.com/Abdirahman-Maalim/faraja.git
     targetRevision: Developer
-    path: k8s
+    path: k88Z
   destination:
     server: https://kubernetes.default.svc
     namespace: faraja-ns
