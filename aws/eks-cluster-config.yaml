@@ -17,6 +17,7 @@ managedNodeGroups:
     volumeSize: 20
     ssh:
       allow: false
-
+addons:
+  - name: aws-ebs-csi-driver
 iam:
   withOIDC: true
