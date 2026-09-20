@@ -26,8 +26,8 @@ spec:
     spec:
       containers:
       - name: backend
-        image: faraja-backend:latest
-        imagePullPolicy: Never
+        image: 342278407001.dkr.ecr.us-east-1.amazonaws.com/faraja-backend:latest
+        imagePullPolicy: Alwaya
         resources:
           requests:
             memory: "128Mi"
