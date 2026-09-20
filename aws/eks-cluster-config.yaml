@@ -6,12 +6,14 @@ metadata:
   region: us-east-1
   version: "1.31"
 
-nodeGroups:
-  - name: faraja-nodes
+availabilityZones: ["us-east-1a", "us-east-1b"]
+
+managedNodeGroups:
+  - name: faraja-nodes-v2
     instanceType: t3.medium
-    desiredCapacity: 2
-    minSize: 2
-    maxSize: 3
+    desiredCapacity: 1
+    minSize: 1
+    maxSize: 2
     volumeSize: 20
     ssh:
       allow: false
