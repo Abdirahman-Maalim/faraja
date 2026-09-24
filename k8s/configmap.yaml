@@ -15,7 +15,6 @@ data:
   DB_NAME: faraja
   DB_USER: postgres
   API_PORT: "8000"
-  NEXT_PUBLIC_API_BASE_URL: http://backend:8000
 
 ---
 apiVersion: v1
@@ -25,9 +24,8 @@ metadata:
   namespace: faraja-ns
   labels:
     app: faraja
-data:
-  DATABASE_URL: postgresql+psycopg://postgres:postgres@faraja-db-svc:5432/faraja 
-  FRONTEND_ORIGIN: http://192.168.49.2:30001
+data: 
+  FRONTEND_ORIGIN: http://frontend:3001
 
 ---
 
@@ -40,4 +38,4 @@ metadata:
     app: faraja
 data:
   API_INTERNAL_URL: http://faraja-backend-svc:8000 
-  NEXT_PUBLIC_API_BASE_URL: http://192.168.49.2:32767
+  NEXT_PUBLIC_API_BASE_URL: http://faraja-backend-svc:8000

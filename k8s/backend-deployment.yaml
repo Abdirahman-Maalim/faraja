@@ -27,7 +27,7 @@ spec:
       containers:
       - name: backend
         image: 342278407001.dkr.ecr.us-east-1.amazonaws.com/faraja-backend:latest
-        imagePullPolicy: Alwaya
+        imagePullPolicy: Always
         resources:
           requests:
             memory: "128Mi"
@@ -41,9 +41,9 @@ spec:
         env:
         - name: DATABASE_URL
           valueFrom:
-            configMapKeyRef:
+            secretKeyRef:
+              name: faraja-db-secret
               key: DATABASE_URL
-              name: backend-configmap
         - name: FRONTEND_ORIGIN
           valueFrom:
             configMapKeyRef:
