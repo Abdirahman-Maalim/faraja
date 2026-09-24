@@ -1,0 +1,3 @@
+aws_region   = "us-east-1"
+cluster_name = "faraja-cluster"
+cluster_endpoint_public_access_cidrs = ["YOUR.IP.HERE/32"]
