@@ -756,6 +756,116 @@ To display `0` instead, use:
 
 This returns `0` when the original query has no results.
 
+
+## GitOps Deployment with ArgoCD
+
+Faraja is deployed using [ArgoCD](https://argo-cd.readthedocs.io/), a declarative GitOps continuous delivery tool for Kubernetes. Rather than deploying manifests manually, ArgoCD continuously reconciles the live state of each cluster against the manifests defined in this repository — any drift between the two is either flagged or automatically corrected, depending on the sync policy in effect.
+
+Two independent environments are maintained, each with its own dedicated ArgoCD instance and its own Git branch, so that changes to one never affect the other.
+
+### Environments
+
+| Environment | Cluster | Branch | Manifest path | Purpose |
+|---|---|---|---|---|
+| Local | Minikube | [`Developer`](https://github.com/Abdirahman-Maalim/faraja/tree/Developer/k8s) | `k8s/` | Local development and testing |
+| Cloud | Amazon EKS | [`eks-deployment`](https://github.com/Abdirahman-Maalim/faraja/tree/eks-deployment/k8s) | `k8s/` | Cloud deployment on AWS |
+
+Each ArgoCD `Application` resource ([`argocd/faraja-app.yaml`](https://github.com/Abdirahman-Maalim/faraja/tree/Developer/argocd)) targets a specific branch via `spec.source.targetRevision`, meaning the two environments can diverge on infrastructure-specific concerns — storage backend, image registry, ingress configuration — while sharing the same application logic and deployment pipeline pattern.
+
+### Sync policy
+
+Both environments run with automated sync enabled:
+
+```yaml
+syncPolicy:
+  automated:
+    prune: true
+    selfHeal: true
+  syncOptions:
+    - CreateNamespace=true
+```
+
+- **`selfHeal`** reverts any manual or out-of-band change to the live cluster back to what Git declares.
+- **`prune`** removes resources from the cluster when they're removed from Git, keeping the cluster's actual state a faithful mirror of the repository rather than accumulating orphaned resources over time.
+
+### Environment-specific differences
+
+The `Developer` and `eks-deployment` branches intentionally diverge on the following, to account for the underlying infrastructure differences between a single-node local cluster and a multi-node cloud cluster:
+
+- **Container images** — `Developer` uses images built directly into Minikube's local Docker daemon; `eks-deployment` pulls from Amazon ECR.
+- **Persistent storage** — `Developer` uses a `hostPath`-backed `PersistentVolume`, suitable only for a single-node local cluster; `eks-deployment` uses a dynamically-provisioned `StorageClass` backed by Amazon EBS (`ebs-sc`), required for durability across a multi-node cloud cluster where pods may be rescheduled to any node.
+- **Database credentials** — sourced from a Kubernetes `Secret` in both environments, never from a `ConfigMap`.
+
+### Accessing the ArgoCD UI
+
+```bash
+kubectl port-forward --address 0.0.0.0 svc/argocd-server -n argocd 8085:443
+```
+
+Retrieve the initial admin password:
+
+```bash
+kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d
+```
+
+Then navigate to `https://<host>:8085`.
+
+
+## Infrastructure as Code with Terraform
+
+The AWS infrastructure backing the `eks-deployment` environment — networking, IAM, the EKS control plane, node group, and supporting add-ons — is fully defined and provisioned via [Terraform](https://www.terraform.io/), located in [`terraform/`](https://github.com/Abdirahman-Maalim/faraja/tree/eks-deployment/terraform) on the `eks-deployment` branch.
+
+### Design
+
+Infrastructure is organized as one module per logical AWS resource group, rather than a single monolithic configuration:
+
+
+### Remote state
+
+Terraform state is stored remotely in a versioned, encrypted S3 bucket, with state locking via DynamoDB, provisioned once via `terraform/bootstrap/`. No state file is ever committed to this repository; state exists solely in AWS and is retrieved automatically by anyone running Terraform against this configuration with appropriate AWS credentials.
+
+### Security
+
+- The EKS API server's public endpoint is restricted to an explicit allow-list of CIDR blocks (`cluster_endpoint_public_access_cidrs`) rather than left open to `0.0.0.0/0`.
+- Private-subnet endpoint access is enabled alongside the public endpoint, allowing worker nodes to reach the control plane over the VPC's internal network without depending on the public-access allow-list.
+- Kubernetes secrets are encrypted at rest via a dedicated KMS key (`encryption_config` on the EKS cluster resource).
+- Control-plane audit, API, and authenticator logs are shipped to CloudWatch (`enabled_cluster_log_types`).
+- No AWS credentials are ever hardcoded in configuration; the AWS provider uses the ambient credential chain (`aws configure` / environment / instance role).
+- Every resource is tagged (`Project`, `Environment`, `ManagedBy`) via a provider-level `default_tags` block for cost allocation and auditability.
+
+### Provisioning
+
+```bash
+cd terraform/bootstrap
+terraform init
+terraform apply
+
+cd ..
+terraform init
+terraform plan
+terraform apply
+```
+
+Container images already pushed to ECR outside of Terraform are brought under management via import rather than recreation:
+
+```bash
+terraform import module.ecr.aws_ecr_repository.backend faraja-backend
+terraform import module.ecr.aws_ecr_repository.frontend faraja-frontend
+```
+
+### Connecting to the cluster
+
+```bash
+aws eks update-kubeconfig --region us-east-1 --name faraja-cluster
+kubectl get nodes
+```
+
+### Teardown
+
+```bash
+terraform destroy
+```
+
 ## Git Branching Best Practices
 
 We follow a structured branching strategy to keep development organized and protect the main codebase.
