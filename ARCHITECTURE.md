@@ -9,7 +9,6 @@ The system uses **Terraform and AWS for infrastructure**, **Docker for container
 The architecture separates infrastructure management, application deployment, data storage, and observability.
 
 ---
-
 ## 2. High-Level Architecture
 
 ```text
@@ -126,7 +125,7 @@ The main application components are:
 
 * FastAPI backend
 * PostgreSQL database
-* Optional Next.js frontend
+* Next.js frontend
 
 The general image workflow is:
 
