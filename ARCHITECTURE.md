@@ -208,7 +208,7 @@ The backend communicates with PostgreSQL through the Kubernetes service rather t
 
 ### Frontend
 
-The optional Next.js frontend provides the user-facing interface.
+The Next.js frontend provides the user-facing interface.
 
 The frontend communicates with the backend through the Kubernetes service.
 
