@@ -1,8 +1,3 @@
-resource "aws_kms_key" "eks_secrets" {
-  description             = "Encrypts EKS Kubernetes secrets at rest for ${var.cluster_name}"
-  deletion_window_in_days = 7
-}
-
 resource "aws_eks_cluster" "main" {
   name     = var.cluster_name
   version  = var.cluster_version
@@ -13,13 +8,6 @@ resource "aws_eks_cluster" "main" {
     endpoint_public_access  = true
     endpoint_private_access = true
     public_access_cidrs     = var.public_access_cidrs
-  }
-
-  encryption_config {
-    provider {
-      key_arn = aws_kms_key.eks_secrets.arn
-    }
-    resources = ["secrets"]
   }
 
   enabled_cluster_log_types = ["api", "audit", "authenticator"]
