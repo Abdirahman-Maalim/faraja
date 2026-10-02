@@ -32,15 +32,15 @@ variable "node_instance_type" {
 }
 variable "node_desired_capacity" {
   type    = number
-  default = 2
+  default = 4
 }
 variable "node_min_size" {
   type    = number
-  default = 2
+  default = 4
 }
 variable "node_max_size" {
   type    = number
-  default = 2
+  default = 4
 }
 variable "node_volume_size" {
   type    = number
