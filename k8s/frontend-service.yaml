@@ -9,7 +9,7 @@ metadata:
     team: cne01
     project: faraja
 spec:
-  type: NodePort
+  type: LoadBalancer
   selector:
     app: frontend
     tier: frontend
