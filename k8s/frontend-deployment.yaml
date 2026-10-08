@@ -24,8 +24,8 @@ spec:
     spec:
       containers:
       - name: frontend
-        image: faraja-frontend:latest
-        imagePullPolicy: Never
+        image: 327936092308.dkr.ecr.us-east-1.amazonaws.com/faraja-frontend:v1
+        imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 3001
           name: http

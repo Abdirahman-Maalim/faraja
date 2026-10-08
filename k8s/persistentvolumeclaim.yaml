@@ -3,15 +3,10 @@ kind: PersistentVolumeClaim
 metadata:
   name: faraja-pvc
   namespace: faraja-ns
-  labels:
-    app: postgres
-    tier: database
-    team: cne01
-    project: faraja
 spec:
   accessModes:
     - ReadWriteOnce
+  storageClassName: gp2
   resources:
     requests:
-      storage: 1Gi
-  storageClassName: standard
+      storage: 5Gi
