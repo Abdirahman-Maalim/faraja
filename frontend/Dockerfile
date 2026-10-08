@@ -1,52 +1,72 @@
-# STAGE 1: Builder
-FROM node:18-alpine3.21 AS builder
+# syntax=docker/dockerfile:1.7
+# check=error=true
 
-LABEL maintainer="teqiee"
-LABEL description="Faraja frontend builder stage"
-LABEL version="1.0.0"
+# STAGE 1: Dependencies
+FROM node:18-alpine3.21 AS deps
 
 WORKDIR /app
 
-COPY package*.json ./
+COPY package.json package-lock.json ./
 
-RUN npm config set fetch-retries 5 && \
-    npm config set fetch-retry-mintimeout 20000 && \
-    npm config set fetch-retry-maxtimeout 120000 && \
-    npm config set fetch-timeout 300000
+RUN npm config set fetch-retries 5 \
+ && npm config set fetch-retry-mintimeout 20000 \
+ && npm config set fetch-retry-maxtimeout 120000 \
+ && npm config set fetch-timeout 300000 \
+ && npm ci
 
-RUN npm ci
+# STAGE 2: builder 
+FROM node:18-alpine3.21 AS builder
 
+WORKDIR /app
+
+COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-# Accept the API base URL at build time so it's baked into client-side JS
-ARG NEXT_PUBLIC_API_BASE_URL
+ARG NEXT_PUBLIC_API_BASE_URL=/api
 ENV NEXT_PUBLIC_API_BASE_URL=$NEXT_PUBLIC_API_BASE_URL
+ENV NEXT_TELEMETRY_DISABLED=1
 
+# runs setup commands
 RUN npm run build
 
-# STAGE 2: Runner (Production)
+# removes build-only tools (package.json unchanged)
+RUN rm -rf \
+      node_modules/typescript \
+      node_modules/eslint \
+      node_modules/eslint-config-next \
+      node_modules/tailwindcss \
+      node_modules/postcss \
+      node_modules/autoprefixer \
+      node_modules/@types \
+      node_modules/.bin/tsc \
+      node_modules/.bin/eslint \
+      node_modules/.bin/tailwindcss
+      
+# STAGE 3: Runner (Production)
 FROM node:18-alpine3.21 AS runner
 
-LABEL maintainer="teqiee"
-LABEL description="Faraja frontend production image"
-LABEL version="1.0.0"
+LABEL org.opencontainers.image.title="faraja-frontend"
+LABEL org.opencontainers.image.description="Faraja Next.js frontend"
+LABEL org.opencontainers.image.source="https://github.com/Abdirahman-Maalim/faraja"
 
 WORKDIR /app
 
 # Install curl for healthcheck
 RUN apk add --no-cache curl
 
-ENV NODE_ENV=production
-ENV NEXT_TELEMETRY_DISABLED=1
+ENV NODE_ENV=production \
+    NEXT_TELEMETRY_DISABLED=1 \
+    PORT=3001
 
 # Create non-root user
 RUN addgroup --system --gid 1001 nodejs && \
     adduser --system --uid 1001 -G nodejs nextjs
 
-# Copy built app AND node_modules directly from builder (prevents 2nd npm ci hang)
+# Copy built app AND node_modules directly from builder 
 COPY --from=builder --chown=nextjs:nodejs /app/.next ./.next
-COPY --from=builder --chown=nextjs:nodejs /app/node_modules ./node_modules
-COPY --from=builder --chown=nextjs:nodejs /app/package*.json ./
+COPY --from=builder --chown=nextjs:nodejs /app/node_modules     ./node_modules
+COPY --from=builder --chown=nextjs:nodejs /app/package.json     ./package.json
+COPY --from=builder --chown=nextjs:nodejs /app/next.config.mjs  ./next.config.mjs
 
 USER nextjs
 
