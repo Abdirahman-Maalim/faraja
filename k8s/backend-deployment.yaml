@@ -6,7 +6,7 @@ metadata:
   labels:
     app: faraja
 spec:
-  replicas: 3
+  replicas: 2
 
   strategy:
     type: RollingUpdate
@@ -31,10 +31,17 @@ spec:
         resources:
           requests:
             memory: "128Mi"
-            cpu: "0.5"
+            cpu: "100m"
           limits:
-            memory: "128Mi"
-            cpu: "1"
+            memory: "256Mi"
+            cpu: "500m"
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          failureThreshold: 10
         ports:
         - containerPort: 8000
           name: backend-port

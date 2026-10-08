@@ -8,9 +8,8 @@ metadata:
 spec:
   selector:
     app: faraja
-  type: NodePort
+  type: ClusterIP
   ports:
   - name: http
     port: 8000
     targetPort: backend-port
-    nodePort: 32767
