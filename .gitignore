@@ -12,8 +12,14 @@ backend/.mypy_cache
 
 # Environment files
 .env
+.env.*
+!.env.example
+!.env.local.example
+
+# Kubernetes secrets
+k8s/postgres-secret.yaml
 
 # OS / editor
 .DS_Store
 .vscode/*.log
-.env
+frontend/next-env.d.ts
