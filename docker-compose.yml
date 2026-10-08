@@ -8,7 +8,7 @@ services:
     env_file:
       - .env
     ports:
-      - "${POSTGRES_PORT:-5432}:5432"
+      - "127.0.0.1:${POSTGRES_PORT:-5433}:5432"
     volumes:
       - faraja-db-data:/var/lib/postgresql/data
     healthcheck:
@@ -40,7 +40,7 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-      start_period: 10s
+      start_period: 15s
     networks:
       - faraja-net
 
@@ -58,11 +58,12 @@ services:
     environment:
       # Server-side (SSR) fetches happen inside the Docker network, so
       # they use the service name "backend", not localhost or an IP.
-      NEXT_PUBLIC_API_BASE_URL: http://backend:8000
+      API_INTERNAL_URL: http://backend:8000
     ports:
       - "${FRONTEND_PORT:-3001}:3001"
     depends_on:
-      - backend
+      backend:
+        condition: service_healthy
     networks:
       - faraja-net
 
