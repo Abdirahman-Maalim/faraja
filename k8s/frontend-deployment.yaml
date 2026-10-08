@@ -24,18 +24,13 @@ spec:
     spec:
       containers:
       - name: frontend
-        image: teqiee/faraja-frontend:latest
-        imagePullPolicy: IfNotPresent
+        image: faraja-frontend:latest
+        imagePullPolicy: Never
         ports:
         - containerPort: 3001
           name: http
         env:
-        - name: NEXT_PUBLIC_API_BASE_URL
-          valueFrom:
-            configMapKeyRef:
-              name: frontend-configmap
-              key: NEXT_PUBLIC_API_BASE_URL
-        - name: INTERNAL_API_BASE_URL
+        - name: API_INTERNAL_URL
           valueFrom:
             configMapKeyRef:
               name: frontend-configmap

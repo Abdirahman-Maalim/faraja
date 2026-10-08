@@ -1,7 +1,13 @@
 import { CreateProjectPayload, Project } from "@/lib/types";
 
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://127.0.0.1:8000";
+const PUBLIC_API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+const INTERNAL_API_BASE_URL = process.env.API_INTERNAL_URL;
+
+const API_BASE_URL: string =
+  typeof window === "undefined"
+    ? INTERNAL_API_BASE_URL ?? PUBLIC_API_BASE_URL ?? "/api"
+    : PUBLIC_API_BASE_URL ?? "/api";
+
 export async function listProjects(): Promise<Project[]> {
   try {
     const response = await fetch(`${API_BASE_URL}/projects`, {

@@ -9,13 +9,12 @@ metadata:
     team: cne01
     project: faraja
 spec:
-  type: NodePort
+  type: ClusterIP
   selector:
     app: frontend
     tier: frontend
   ports:
   - port: 3001
-    targetPort: 3001
-    nodePort: 30001
+    targetPort: http
     protocol: TCP
     name: http
