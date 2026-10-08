@@ -1,7 +1,14 @@
-# git files
 .git
 .gitignore
-
-# environment variable files
 .env
 .env.*
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.vscode/
+.DS_Store
+*.md
+tests/
