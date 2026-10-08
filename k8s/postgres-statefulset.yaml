@@ -10,7 +10,7 @@ metadata:
     environment: development
     project: faraja
 spec:
-  serviceName: postgres-headless   # must match postgres-headless-service.yaml
+  serviceName: faraja-db-headless   # must match postgres-headless-service.yaml
   replicas: 1
   updateStrategy:
     type: RollingUpdate
