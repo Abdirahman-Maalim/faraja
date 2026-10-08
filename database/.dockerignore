@@ -1,0 +1,29 @@
+# git
+.git
+.gitignore
+.gitattributes
+
+# environment files
+.env
+.env.*
+
+# docs
+*.md
+README.md
+
+# editor / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.swp
+*~
+
+# docker metadata
+Dockerfile
+.dockerignore
+
+# local data (if you ever mount into the folder)
+data/
+*.sql
+*.dump
