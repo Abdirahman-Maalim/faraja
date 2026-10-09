@@ -1,0 +1,83 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: faraja-backend-deployment
+  namespace: faraja-ns
+  labels:
+    app: faraja
+spec:
+  replicas: 2
+
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+
+  selector:
+    matchLabels:
+      app: faraja
+
+  template:
+    metadata:
+      labels:
+        app: faraja
+
+    spec:
+      containers:
+      - name: backend
+        image: 327936092308.dkr.ecr.us-east-1.amazonaws.com/faraja-backend:v1
+        imagePullPolicy: IfNotPresent
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "500m"
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          failureThreshold: 10
+        ports:
+        - containerPort: 8000
+          name: backend-port
+        env:
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: faraja-db-secret
+              key: DATABASE_URL
+        - name: FRONTEND_ORIGIN
+          valueFrom:
+            configMapKeyRef:
+              key: FRONTEND_ORIGIN
+              name: backend-configmap
+        - name: DB_HOST
+          valueFrom:
+            configMapKeyRef:
+              key: DB_HOST
+              name: faraja-config
+        - name: DB_PORT
+          valueFrom:
+            configMapKeyRef:
+              key: DB_PORT
+              name: faraja-config
+        - name: DB_NAME
+          valueFrom:
+            configMapKeyRef:
+              key: DB_NAME
+              name: faraja-config
+        - name: DB_USER
+          valueFrom:
+            configMapKeyRef:
+              key: DB_USER
+              name: faraja-config
+        - name: API_PORT
+          valueFrom:
+            configMapKeyRef:
+              key: API_PORT
+              name: faraja-config

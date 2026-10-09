@@ -1,0 +1,68 @@
+# Environment files (security!)
+.env
+.env.local
+.env.production
+.env.development
+.env.test
+
+# Dependencies (large folders)
+node_modules/
+yarn.lock
+
+# Build outputs
+.next/
+out/
+dist/
+build/
+.vercel/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+*.pid
+*.seed
+*.pid.lock
+
+# OS files
+.DS_Store
+Thumbs.db
+*.tmp
+*.swp
+*.swo
+*~
+
+# IDE files
+.vscode/
+.idea/
+*.iml
+*.sublime-*
+
+# Git files
+.git/
+.gitignore
+.gitattributes
+
+# Test files
+coverage/
+.nyc_output/
+__tests__/
+*.test.js
+*.spec.js
+*.test.ts
+*.spec.ts
+
+# Docker files (optional to exclude)
+# Dockerfile
+# .dockerignore
+
+# Temporary files
+*.tmp
+*.temp
+.cache/
+
+# Miscellaneous
+*.tgz
+*.gz
+*.zip

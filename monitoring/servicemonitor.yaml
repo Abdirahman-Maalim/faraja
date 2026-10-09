@@ -1,0 +1,18 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: faraja-backend-monitor
+  namespace: monitoring
+  labels:
+    release: monitoring
+spec:
+  namespaceSelector:
+    matchNames:
+      - faraja-ns
+  selector:
+    matchLabels:
+      app: faraja
+  endpoints:
+    - port: http
+      path: /metrics
+      interval: 15s

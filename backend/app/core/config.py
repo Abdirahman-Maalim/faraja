@@ -8,7 +8,7 @@ class Settings(BaseSettings):
     database_url: str = Field(
         default="postgresql+psycopg://postgres:postgres@localhost:5432/faraja"
     )
-    frontend_origin: str = "http://localhost:3000,http://127.0.0.1:3001,http://localhost:3001,http://127.0.0.1:3001"
+    frontend_origin: str = ""
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 

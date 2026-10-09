@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: faraja-ns
+  labels:
+    team: cne01
+    environment: development
+    project: faraja
+    app: faraja

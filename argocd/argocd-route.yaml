@@ -1,0 +1,15 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: argocd-route
+  namespace: argocd
+spec:
+  parentRefs:
+    - name: faraja-gateway
+      namespace: faraja-ns
+  hostnames:
+    - argocd.faraja.kubeverse.io
+  rules:
+    - backendRefs:
+        - name: argocd-server
+          port: 80
