@@ -11,4 +11,9 @@ spec:
       protocol: HTTP
       allowedRoutes:
         namespaces:
-          from: All   # lets Grafana/ArgoCD routes in other namespaces attach later
+          from: Selector
+          selector:
+            matchExpressions:
+              - key: kubernetes.io/metadata.name
+                operator: In
+                values: [faraja-ns, monitoring, argocd]
