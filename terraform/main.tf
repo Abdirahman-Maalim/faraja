@@ -47,3 +47,8 @@ module "ecr" {
   backend_repo_name   = var.ecr_backend_repo_name
   frontend_repo_name  = var.ecr_frontend_repo_name
 }
+
+module "jenkins_ci" {
+  source          = "./modules/jenkins-ci"
+  repository_arns = [module.ecr.backend_repository_arn, module.ecr.frontend_repository_arn]
+}
