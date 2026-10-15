@@ -14,12 +14,19 @@ grafana:
   readinessProbe:
     httpGet:
       path: /grafana/api/health
+    timeoutSeconds: 5
+    periodSeconds: 10
+    failureThreshold: 6
   livenessProbe:
     httpGet:
       path: /grafana/api/health
   resources:
-    requests: {cpu: 50m, memory: 128Mi}
-    limits: {memory: 256Mi}
+    requests: {cpu: 100m, memory: 256Mi}
+    limits: {memory: 512Mi}
+  sidecar:
+    resources:
+      requests: {cpu: 10m, memory: 64Mi}
+      limits: {memory: 256Mi}
 prometheus:
   prometheusSpec:
     serviceMonitorSelectorNilUsesHelmValues: false
