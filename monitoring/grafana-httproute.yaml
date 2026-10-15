@@ -7,13 +7,11 @@ spec:
   parentRefs:
     - name: faraja-gateway
       namespace: faraja-ns
-  hostnames:
-    - grafana.local
   rules:
     - matches:
         - path:
             type: PathPrefix
-            value: /
+            value: /grafana
       backendRefs:
         - name: monitoring-grafana
           port: 80
