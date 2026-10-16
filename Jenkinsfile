@@ -35,13 +35,13 @@ pipeline {
     stage('Backend image') {
       when { environment name: 'BOT', value: 'false' }
       steps {
-        sh 'docker buildx build --platform linux/amd64 -t $REGISTRY/faraja-backend:$TAG -t $REGISTRY/faraja-backend:latest --push ./backend'
+        retry(3) { sh 'docker buildx build --platform linux/amd64 -t $REGISTRY/faraja-backend:$TAG -t $REGISTRY/faraja-backend:latest --push ./backend' }
       }
     }
     stage('Frontend image') {
       when { environment name: 'BOT', value: 'false' }
       steps {
-        sh 'docker buildx build --platform linux/amd64 --build-arg NEXT_PUBLIC_API_BASE_URL=/api -t $REGISTRY/faraja-frontend:$TAG -t $REGISTRY/faraja-frontend:latest --push ./frontend'
+        retry(3) { sh 'docker buildx build --platform linux/amd64 --build-arg NEXT_PUBLIC_API_BASE_URL=/api -t $REGISTRY/faraja-frontend:$TAG -t $REGISTRY/faraja-frontend:latest --push ./frontend' }
       }
     }
     stage('Deploy via GitOps') {
