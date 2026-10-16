@@ -20,7 +20,7 @@ export default async function HomePage() {
   return (
     <main>
       <section className="header">
-        <h1 style={{ marginTop: 0, marginBottom: 8 }}>Faraja Public Tracker</h1>
+        <h1 style={{ marginTop: 0, marginBottom: 8 }}>Faraja Public Tracker · CI/CD live</h1>
         <p style={{ margin: 0, maxWidth: 700 }}>
           A transparency dashboard to track government project delivery, spending,
           and implementation progress for citizen accountability.
