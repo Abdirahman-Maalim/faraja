@@ -24,7 +24,7 @@ spec:
     spec:
       containers:
       - name: frontend
-        image: 342278407001.dkr.ecr.us-east-1.amazonaws.com/faraja-frontend:latest
+        image: 342278407001.dkr.ecr.us-east-1.amazonaws.com/faraja-frontend:9ad72e6c
         imagePullPolicy: Always
         ports:
         - containerPort: 3001

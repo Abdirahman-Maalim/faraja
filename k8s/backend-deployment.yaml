@@ -26,7 +26,7 @@ spec:
     spec:
       containers:
       - name: backend
-        image: 342278407001.dkr.ecr.us-east-1.amazonaws.com/faraja-backend:latest
+        image: 342278407001.dkr.ecr.us-east-1.amazonaws.com/faraja-backend:9ad72e6c
         imagePullPolicy: Always
         resources:
           requests:
