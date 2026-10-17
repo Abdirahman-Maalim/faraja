@@ -7,6 +7,7 @@ spec:
   parentRefs:
     - name: faraja-gateway
       namespace: faraja-ns
+      sectionName: https
   rules:
     - matches:
         - path:
