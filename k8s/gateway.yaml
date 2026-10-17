@@ -3,6 +3,8 @@ kind: Gateway
 metadata:
   name: faraja-gateway
   namespace: faraja-ns
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-staging
 spec:
   gatewayClassName: nginx
   listeners:
@@ -17,3 +19,21 @@ spec:
               - key: kubernetes.io/metadata.name
                 operator: In
                 values: [faraja-ns, monitoring, argocd]
+    - name: https
+      hostname: faraja.kubeverse.io
+      port: 443
+      protocol: HTTPS
+      allowedRoutes:
+        namespaces:
+          from: Selector
+          selector:
+            matchExpressions:
+              - key: kubernetes.io/metadata.name
+                operator: In
+                values: [faraja-ns, monitoring, argocd]
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - name: faraja-tls
+            kind: Secret
+            group: ""
