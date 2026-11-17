@@ -1,5 +1,6 @@
 resource "aws_iam_role" "ebs_csi" {
-  name = "${var.cluster_name}-ebs-csi-driver-role"
+  name                 = "${var.cluster_name}-ebs-csi-driver-role"
+  permissions_boundary = var.permissions_boundary_arn
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"

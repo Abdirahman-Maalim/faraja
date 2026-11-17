@@ -1,24 +1,36 @@
 module "vpc" {
-  source                = "./modules/vpc"
-  cluster_name          = var.cluster_name
-  vpc_cidr              = var.vpc_cidr
-  availability_zones    = var.availability_zones
-  public_subnet_cidrs   = var.public_subnet_cidrs
-  private_subnet_cidrs  = var.private_subnet_cidrs
+  source               = "./modules/vpc"
+  cluster_name         = var.cluster_name
+  vpc_cidr             = var.vpc_cidr
+  availability_zones   = var.availability_zones
+  public_subnet_cidrs  = var.public_subnet_cidrs
+  private_subnet_cidrs = var.private_subnet_cidrs
 }
 
 module "iam" {
-  source       = "./modules/iam"
-  cluster_name = var.cluster_name
+  source                   = "./modules/iam"
+  cluster_name             = var.cluster_name
+  ecr_repository_arns      = [module.ecr.backend_repository_arn, module.ecr.frontend_repository_arn]
+  cni_via_irsa             = var.cni_via_irsa
+  permissions_boundary_arn = var.permissions_boundary_arn
 }
 
 module "eks_cluster" {
-  source               = "./modules/eks-cluster"
-  cluster_name         = var.cluster_name
-  cluster_version      = var.cluster_version
-  cluster_role_arn     = module.iam.cluster_role_arn
-  subnet_ids           = concat(module.vpc.public_subnet_ids, module.vpc.private_subnet_ids)
-  public_access_cidrs  = var.cluster_endpoint_public_access_cidrs
+  source              = "./modules/eks-cluster"
+  cluster_name        = var.cluster_name
+  cluster_version     = var.cluster_version
+  cluster_role_arn    = module.iam.cluster_role_arn
+  subnet_ids          = concat(module.vpc.public_subnet_ids, module.vpc.private_subnet_ids)
+  public_access_cidrs = var.cluster_endpoint_public_access_cidrs
+}
+
+module "irsa_vpc_cni" {
+  count                    = var.cni_via_irsa ? 1 : 0
+  source                   = "./modules/irsa-vpc-cni"
+  cluster_name             = module.eks_cluster.cluster_name
+  oidc_provider_arn        = module.eks_cluster.oidc_provider_arn
+  oidc_provider_url        = module.eks_cluster.oidc_provider_url
+  permissions_boundary_arn = var.permissions_boundary_arn
 }
 
 module "eks_nodegroup" {
@@ -31,24 +43,26 @@ module "eks_nodegroup" {
   min_size         = var.node_min_size
   max_size         = var.node_max_size
   volume_size      = var.node_volume_size
-  depends_on       = [module.iam, module.eks_cluster]
+  depends_on       = [module.iam, module.eks_cluster, module.irsa_vpc_cni]
 }
 
 module "irsa_ebs_csi" {
-  source            = "./modules/irsa-ebs-csi"
-  cluster_name      = module.eks_cluster.cluster_name
-  oidc_provider_arn = module.eks_cluster.oidc_provider_arn
-  oidc_provider_url = module.eks_cluster.oidc_provider_url
-  depends_on        = [module.eks_nodegroup]
+  source                   = "./modules/irsa-ebs-csi"
+  cluster_name             = module.eks_cluster.cluster_name
+  oidc_provider_arn        = module.eks_cluster.oidc_provider_arn
+  oidc_provider_url        = module.eks_cluster.oidc_provider_url
+  permissions_boundary_arn = var.permissions_boundary_arn
+  depends_on               = [module.eks_nodegroup]
 }
 
 module "ecr" {
-  source              = "./modules/ecr"
-  backend_repo_name   = var.ecr_backend_repo_name
-  frontend_repo_name  = var.ecr_frontend_repo_name
+  source             = "./modules/ecr"
+  backend_repo_name  = var.ecr_backend_repo_name
+  frontend_repo_name = var.ecr_frontend_repo_name
 }
 
 module "jenkins_ci" {
-  source          = "./modules/jenkins-ci"
-  repository_arns = [module.ecr.backend_repository_arn, module.ecr.frontend_repository_arn]
+  source               = "./modules/jenkins-ci"
+  repository_arns      = [module.ecr.backend_repository_arn, module.ecr.frontend_repository_arn]
+  allowed_source_cidrs = var.jenkins_allowed_source_cidrs
 }

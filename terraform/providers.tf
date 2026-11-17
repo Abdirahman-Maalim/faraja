@@ -17,7 +17,7 @@ provider "aws" {
 
   # Guard rail: refuses to apply if the active AWS profile isn't this
   # account — cheap insurance against a wrong-account mistake.
-  allowed_account_ids = ["342278407001"]
+  allowed_account_ids = [var.aws_account_id]
 
   default_tags {
     tags = {
