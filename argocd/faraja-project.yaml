@@ -1,0 +1,22 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: faraja
+  namespace: argocd
+spec:
+  description: Faraja application (least privilege)
+  sourceRepos:
+    - https://github.com/Abdirahman-Maalim/faraja.git
+  destinations:
+    - server: https://kubernetes.default.svc
+      namespace: faraja-ns
+  clusterResourceWhitelist:
+    - group: ""
+      kind: Namespace
+    - group: storage.k8s.io
+      kind: StorageClass
+  namespaceResourceBlacklist:
+    - group: ""
+      kind: ResourceQuota
+    - group: ""
+      kind: LimitRange

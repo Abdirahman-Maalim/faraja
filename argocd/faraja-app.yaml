@@ -4,11 +4,14 @@ metadata:
   name: faraja
   namespace: argocd
 spec:
-  project: default
+  project: faraja
   source:
     repoURL: https://github.com/Abdirahman-Maalim/faraja.git
     targetRevision: eks-deployment
-    path: k8s
+    path: helm/faraja
+    helm:
+      valueFiles:
+        - values-eks.yaml
   destination:
     server: https://kubernetes.default.svc
     namespace: faraja-ns
