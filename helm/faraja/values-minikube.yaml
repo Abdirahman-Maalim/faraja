@@ -1,6 +1,6 @@
 imageRegistry: ""
 imagePullPolicy: IfNotPresent
-createNamespace: true
+createNamespace: false
 
 backend:
   image: {tag: local}
