@@ -151,6 +151,12 @@ Open `https://localhost:8080` (accept the self-signed certificate warning) and s
 kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d; echo
 ```
 
+## Helm Chart and IAM Least Privilege
+
+The application is packaged as a Helm chart in [`helm/faraja/`](helm/faraja) with one values file per environment (`values-minikube.yaml`, `values-eks.yaml`). ArgoCD renders the chart with `values-eks.yaml`; Jenkins lints and schema-checks it, then commits new image tags. See [`docs/helm.md`](docs/helm.md).
+
+IAM follows least privilege: pull-only node role scoped to the Faraja repositories, VPC CNI permissions through IRSA, a restricted Jenkins user, a scoped Terraform deployer policy with a permission boundary, and an ArgoCD AppProject. See [`docs/iam.md`](docs/iam.md).
+
 ## Infrastructure as Code with Terraform
 
 The AWS infrastructure behind the `eks-deployment` environment is fully defined in [Terraform](https://www.terraform.io/), in [`terraform/`](https://github.com/Abdirahman-Maalim/faraja/tree/eks-deployment/terraform).
