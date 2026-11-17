@@ -1,0 +1,80 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: faraja-db-sts
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: postgres
+    tier: database
+    environment: {{ .Values.environment }}
+    {{- include "faraja.commonLabels" . | nindent 4 }}
+spec:
+  serviceName: faraja-db-headless
+  replicas: 1
+  updateStrategy:
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      app: postgres
+      tier: database
+  template:
+    metadata:
+      labels:
+        app: postgres
+        tier: database
+        environment: {{ .Values.environment }}
+        {{- include "faraja.commonLabels" . | nindent 8 }}
+    spec:
+      containers:
+        - name: faraja-db
+          image: {{ .Values.database.image }}
+          ports:
+            - name: postgres
+              containerPort: 5432
+          env:
+            - name: POSTGRES_DB
+              valueFrom:
+                configMapKeyRef:
+                  name: faraja-config
+                  key: DB_NAME
+            - name: POSTGRES_USER
+              valueFrom:
+                configMapKeyRef:
+                  name: faraja-config
+                  key: DB_USER
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.dbSecretName }}
+                  key: POSTGRES_PASSWORD
+            - name: PGDATA
+              value: /var/lib/postgresql/data/pgdata
+          volumeMounts:
+            - name: postgres-storage
+              mountPath: /var/lib/postgresql/data
+          resources:
+            {{- toYaml .Values.database.resources | nindent 12 }}
+          readinessProbe:
+            exec:
+              command:
+                - sh
+                - -c
+                - pg_isready -U $POSTGRES_USER -d $POSTGRES_DB
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 10
+            failureThreshold: 15
+          livenessProbe:
+            exec:
+              command:
+                - sh
+                - -c
+                - pg_isready -U $POSTGRES_USER -d $POSTGRES_DB
+            initialDelaySeconds: 15
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 5
+      volumes:
+        - name: postgres-storage
+          persistentVolumeClaim:
+            claimName: faraja-pvc

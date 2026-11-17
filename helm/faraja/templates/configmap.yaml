@@ -1,0 +1,37 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: faraja-config
+  namespace: {{ .Values.namespace }}
+  labels:
+    team: {{ .Values.team }}
+    environment: {{ .Values.environment }}
+    project: {{ .Values.project }}
+    app: faraja
+data:
+  APP_ENV: {{ .Values.config.appEnv | quote }}
+  DB_HOST: {{ .Values.config.dbHost | quote }}
+  DB_PORT: {{ .Values.config.dbPort | quote }}
+  DB_NAME: {{ .Values.config.dbName | quote }}
+  DB_USER: {{ .Values.config.dbUser | quote }}
+  API_PORT: {{ .Values.config.apiPort | quote }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: backend-configmap
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: faraja
+data:
+  FRONTEND_ORIGIN: {{ .Values.backendConfig.frontendOrigin | quote }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: frontend-configmap
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: faraja
+data:
+  API_INTERNAL_URL: {{ .Values.frontendConfig.apiInternalUrl | quote }}

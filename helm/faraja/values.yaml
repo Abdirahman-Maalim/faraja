@@ -1,0 +1,80 @@
+namespace: faraja-ns
+createNamespace: false
+
+environment: development
+team: cne01
+project: faraja
+
+imageRegistry: ""
+imagePullPolicy: Always
+
+config:
+  appEnv: development
+  dbHost: faraja-db-svc
+  dbPort: "5432"
+  dbName: faraja
+  dbUser: postgres
+  apiPort: "8000"
+
+backendConfig:
+  frontendOrigin: ""
+
+frontendConfig:
+  apiInternalUrl: http://faraja-backend-svc:8000
+
+dbSecretName: faraja-db-secret
+
+backend:
+  replicas: 2
+  image:
+    repository: faraja-backend
+    tag: latest
+  port: 8000
+  strategy:
+    maxSurge: 1
+    maxUnavailable: 1
+  resources:
+    requests: {cpu: 100m, memory: 128Mi}
+    limits: {cpu: 500m, memory: 256Mi}
+  readinessProbe:
+    path: /health
+    initialDelaySeconds: 5
+    periodSeconds: 5
+    failureThreshold: 10
+
+frontend:
+  replicas: 2
+  image:
+    repository: faraja-frontend
+    tag: latest
+  port: 3001
+  resources:
+    requests: {cpu: 150m, memory: 128Mi}
+    limits: {cpu: 400m, memory: 256Mi}
+
+database:
+  image: postgres:16-alpine
+  resources:
+    requests: {cpu: 250m, memory: 256Mi}
+    limits: {cpu: 500m, memory: 512Mi}
+
+persistence:
+  size: 1Gi
+  storageClassName: ebs-sc
+
+storageClass:
+  create: true
+  name: ebs-sc
+  provisioner: ebs.csi.aws.com
+  volumeBindingMode: WaitForFirstConsumer
+  reclaimPolicy: Retain
+  parameters:
+    type: gp3
+
+gateway:
+  enabled: true
+  className: nginx
+  host: faraja.kubeverse.io
+  clusterIssuer: letsencrypt-prod
+  tlsSecretName: faraja-tls
+  allowedNamespaces: [faraja-ns, monitoring, argocd]

@@ -1,0 +1,15 @@
+imageRegistry: ""
+imagePullPolicy: IfNotPresent
+createNamespace: true
+
+backend:
+  image: {tag: local}
+frontend:
+  image: {tag: local}
+
+persistence:
+  storageClassName: standard
+storageClass:
+  create: false
+gateway:
+  enabled: false

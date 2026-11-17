@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: faraja-test-connection
+  namespace: {{ .Values.namespace }}
+  annotations:
+    "helm.sh/hook": test
+    "helm.sh/hook-delete-policy": hook-succeeded,before-hook-creation
+spec:
+  restartPolicy: Never
+  containers:
+    - name: check
+      image: busybox:1.36
+      command:
+        - sh
+        - -c
+        - |
+          wget -qO- http://faraja-backend-svc:{{ .Values.backend.port }}{{ .Values.backend.readinessProbe.path }} &&
+          wget -qO- http://frontend:{{ .Values.frontend.port }}/ >/dev/null

@@ -1,0 +1,11 @@
+{{- if .Values.storageClass.create }}
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: {{ .Values.storageClass.name }}
+provisioner: {{ .Values.storageClass.provisioner }}
+volumeBindingMode: {{ .Values.storageClass.volumeBindingMode }}
+reclaimPolicy: {{ .Values.storageClass.reclaimPolicy }}
+parameters:
+  {{- toYaml .Values.storageClass.parameters | nindent 2 }}
+{{- end }}

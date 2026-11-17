@@ -1,0 +1,6 @@
+apiVersion: v2
+name: faraja
+description: Faraja application (frontend, backend, PostgreSQL) with optional Gateway API routing and EBS storage
+type: application
+version: 0.1.0
+appVersion: "1.0.0"

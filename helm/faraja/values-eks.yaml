@@ -1,0 +1,9 @@
+imageRegistry: 342278407001.dkr.ecr.us-east-1.amazonaws.com
+imagePullPolicy: Always
+
+backend:
+  image:
+    tag: c229b3f9
+frontend:
+  image:
+    tag: c229b3f9

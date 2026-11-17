@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: frontend
+    tier: frontend
+    {{- include "faraja.commonLabels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.frontend.replicas }}
+  selector:
+    matchLabels:
+      app: frontend
+      tier: frontend
+  template:
+    metadata:
+      labels:
+        app: frontend
+        tier: frontend
+        {{- include "faraja.commonLabels" . | nindent 8 }}
+    spec:
+      containers:
+      - name: frontend
+        image: {{ include "faraja.image" (dict "root" . "image" .Values.frontend.image) }}
+        imagePullPolicy: {{ .Values.imagePullPolicy }}
+        ports:
+        - containerPort: {{ .Values.frontend.port }}
+          name: http
+        env:
+        - name: API_INTERNAL_URL
+          valueFrom:
+            configMapKeyRef:
+              name: frontend-configmap
+              key: API_INTERNAL_URL
+        resources:
+          {{- toYaml .Values.frontend.resources | nindent 10 }}
+        livenessProbe:
+          httpGet:
+            path: /
+            port: {{ .Values.frontend.port }}
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 5
+        readinessProbe:
+          httpGet:
+            path: /
+            port: {{ .Values.frontend.port }}
+          initialDelaySeconds: 15
+          periodSeconds: 5
+          timeoutSeconds: 5
+          failureThreshold: 5

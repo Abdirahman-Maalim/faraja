@@ -1,0 +1,41 @@
+{{- if .Values.gateway.enabled }}
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: faraja-gateway
+  namespace: {{ .Values.namespace }}
+  annotations:
+    cert-manager.io/cluster-issuer: {{ .Values.gateway.clusterIssuer }}
+spec:
+  gatewayClassName: {{ .Values.gateway.className }}
+  listeners:
+    - name: http
+      port: 80
+      protocol: HTTP
+      allowedRoutes:
+        namespaces:
+          from: Selector
+          selector:
+            matchExpressions:
+              - key: kubernetes.io/metadata.name
+                operator: In
+                values: {{ .Values.gateway.allowedNamespaces | toJson }}
+    - name: https
+      hostname: {{ .Values.gateway.host }}
+      port: 443
+      protocol: HTTPS
+      allowedRoutes:
+        namespaces:
+          from: Selector
+          selector:
+            matchExpressions:
+              - key: kubernetes.io/metadata.name
+                operator: In
+                values: {{ .Values.gateway.allowedNamespaces | toJson }}
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - name: {{ .Values.gateway.tlsSecretName }}
+            kind: Secret
+            group: ""
+{{- end }}

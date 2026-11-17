@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: faraja-backend-deployment
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: faraja
+spec:
+  replicas: {{ .Values.backend.replicas }}
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: {{ .Values.backend.strategy.maxSurge }}
+      maxUnavailable: {{ .Values.backend.strategy.maxUnavailable }}
+  selector:
+    matchLabels:
+      app: faraja
+  template:
+    metadata:
+      labels:
+        app: faraja
+    spec:
+      containers:
+      - name: backend
+        image: {{ include "faraja.image" (dict "root" . "image" .Values.backend.image) }}
+        imagePullPolicy: {{ .Values.imagePullPolicy }}
+        resources:
+          {{- toYaml .Values.backend.resources | nindent 10 }}
+        readinessProbe:
+          httpGet:
+            path: {{ .Values.backend.readinessProbe.path }}
+            port: {{ .Values.backend.port }}
+          initialDelaySeconds: {{ .Values.backend.readinessProbe.initialDelaySeconds }}
+          periodSeconds: {{ .Values.backend.readinessProbe.periodSeconds }}
+          failureThreshold: {{ .Values.backend.readinessProbe.failureThreshold }}
+        ports:
+        - containerPort: {{ .Values.backend.port }}
+          name: backend-port
+        env:
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.dbSecretName }}
+              key: DATABASE_URL
+        - name: FRONTEND_ORIGIN
+          valueFrom:
+            configMapKeyRef:
+              name: backend-configmap
+              key: FRONTEND_ORIGIN
+        {{- range $k := list "DB_HOST" "DB_PORT" "DB_NAME" "DB_USER" "API_PORT" }}
+        - name: {{ $k }}
+          valueFrom:
+            configMapKeyRef:
+              name: faraja-config
+              key: {{ $k }}
+        {{- end }}

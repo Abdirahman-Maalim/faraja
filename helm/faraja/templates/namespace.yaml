@@ -1,0 +1,11 @@
+{{- if .Values.createNamespace }}
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: {{ .Values.namespace }}
+  labels:
+    team: {{ .Values.team }}
+    environment: {{ .Values.environment }}
+    project: {{ .Values.project }}
+    app: faraja
+{{- end }}
