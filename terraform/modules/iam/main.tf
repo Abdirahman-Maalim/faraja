@@ -61,6 +61,12 @@ resource "aws_iam_role_policy" "node_ecr_pull" {
           "ecr:GetDownloadUrlForLayer"
         ]
         Resource = var.ecr_repository_arns
+      },
+      {
+        Sid      = "PullEksSystemImages"
+        Effect   = "Allow"
+        Action   = ["ecr:BatchCheckLayerAvailability", "ecr:BatchGetImage", "ecr:GetDownloadUrlForLayer"]
+        Resource = ["arn:aws:ecr:*:602401143452:repository/*"]
       }
     ]
   })
