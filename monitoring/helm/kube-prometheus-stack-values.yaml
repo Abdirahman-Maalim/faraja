@@ -29,6 +29,8 @@ grafana:
       limits: {memory: 256Mi}
 prometheus:
   prometheusSpec:
+    routePrefix: /prometheus
+    externalUrl: http://aea3bddfabe0f44e5bf8c64310ca59e2-1245471673.us-east-1.elb.amazonaws.com/prometheus
     serviceMonitorSelectorNilUsesHelmValues: false
     retention: 2d
     resources:
