@@ -4,8 +4,10 @@ kind: Gateway
 metadata:
   name: faraja-gateway
   namespace: {{ .Values.namespace }}
+{{- if .Values.gateway.tlsEnabled }}
   annotations:
     cert-manager.io/cluster-issuer: {{ .Values.gateway.clusterIssuer }}
+{{- end }}
 spec:
   gatewayClassName: {{ .Values.gateway.className }}
   listeners:
@@ -20,6 +22,7 @@ spec:
               - key: kubernetes.io/metadata.name
                 operator: In
                 values: {{ .Values.gateway.allowedNamespaces | toJson }}
+{{- if .Values.gateway.tlsEnabled }}
     - name: https
       hostname: {{ .Values.gateway.host }}
       port: 443
@@ -38,4 +41,5 @@ spec:
           - name: {{ .Values.gateway.tlsSecretName }}
             kind: Secret
             group: ""
+{{- end }}
 {{- end }}

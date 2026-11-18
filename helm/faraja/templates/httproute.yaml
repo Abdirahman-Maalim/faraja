@@ -7,7 +7,7 @@ metadata:
 spec:
   parentRefs:
     - name: faraja-gateway
-      sectionName: https
+      sectionName: {{ ternary "https" "http" .Values.gateway.tlsEnabled }}
   rules:
     - matches:
         - path:
@@ -29,6 +29,7 @@ spec:
       backendRefs:
         - name: frontend
           port: {{ .Values.frontend.port }}
+{{- if .Values.gateway.tlsEnabled }}
 ---
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
@@ -47,4 +48,5 @@ spec:
           requestRedirect:
             scheme: https
             statusCode: 301
+{{- end }}
 {{- end }}

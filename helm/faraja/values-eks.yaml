@@ -7,3 +7,6 @@ backend:
 frontend:
   image:
     tag: c229b3f9
+
+gateway:
+  tlsEnabled: false

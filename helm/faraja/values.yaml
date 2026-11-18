@@ -75,6 +75,7 @@ gateway:
   enabled: true
   className: nginx
   host: faraja.kubeverse.io
+  tlsEnabled: true
   clusterIssuer: letsencrypt-prod
   tlsSecretName: faraja-tls
   allowedNamespaces: [faraja-ns, monitoring, argocd]
