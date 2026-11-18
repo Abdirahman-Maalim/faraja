@@ -5,7 +5,7 @@ grafana:
     passwordKey: admin-password
   grafana.ini:
     server:
-      root_url: https://faraja.kubeverse.io/grafana/
+      root_url: http://aea3bddfabe0f44e5bf8c64310ca59e2-1245471673.us-east-1.elb.amazonaws.com/grafana/
       serve_from_sub_path: true
     users:
       allow_sign_up: false
