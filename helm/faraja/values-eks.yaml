@@ -3,10 +3,10 @@ imagePullPolicy: Always
 
 backend:
   image:
-    tag: b937b3cc
+    tag: 8c569919
 frontend:
   image:
-    tag: b937b3cc
+    tag: 8c569919
 
 gateway:
   tlsEnabled: false
