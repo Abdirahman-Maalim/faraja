@@ -1,6 +1,6 @@
 # Helm chart
 
-`helm/faraja/` replaces the raw manifests in `k8s/` (kept until the first successful EKS sync, then removable).
+`helm/faraja/` replaces the raw manifests in `k8s/` (kept for reference; ArgoCD reads only `helm/faraja`).
 
 | File | Purpose |
 |---|---|
@@ -32,3 +32,8 @@ Switching account: change `imageRegistry` in `values-eks.yaml` and `REGISTRY` in
 ```bash
 kubectl -n faraja-ns create secret generic faraja-db-secret --from-literal=POSTGRES_PASSWORD=... --from-literal=DATABASE_URL=...
 ```
+
+## HTTP now, HTTPS later
+`gateway.tlsEnabled: false` (set in `values-eks.yaml`) renders an HTTP-only Gateway and attaches the app route to the `http` listener. With `true` (the chart default) it adds the HTTPS listener, the cert-manager annotation and the HTTP to HTTPS redirect route.
+
+Before switching to `true` you need: cert-manager installed on the cluster, a ClusterIssuer named in `gateway.clusterIssuer`, and a DNS record for `gateway.host` pointing at the load balancer. The Grafana route (`monitoring/grafana-httproute.yaml`) must use the same `sectionName` (`http` or `https`), and Grafana's `root_url` must match the address people use.

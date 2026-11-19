@@ -108,7 +108,7 @@ Faraja is deployed using [ArgoCD](https://argo-cd.readthedocs.io/), a declarativ
 
 | Environment | Cluster | Branch | Manifest path | Purpose |
 |---|---|---|---|---|
-| **Cloud (primary)** | Amazon EKS | [`eks-deployment`](https://github.com/Abdirahman-Maalim/faraja/tree/eks-deployment/k8s) | `k8s/` | Production-style deployment on AWS |
+| **Cloud (primary)** | Amazon EKS | [`eks-deployment`](https://github.com/Abdirahman-Maalim/faraja/tree/eks-deployment/k8s) | `helm/faraja/` (Helm, `values-eks.yaml`) | Production-style deployment on AWS |
 | Local | Minikube | [`Developer`](https://github.com/Abdirahman-Maalim/faraja/tree/Developer/k8s) | `k8s/` | Local development and testing (Parts 3 and 4) |
 
 The ArgoCD `Application` ([`argocd/faraja-app.yaml`](https://github.com/Abdirahman-Maalim/faraja/blob/eks-deployment/argocd/faraja-app.yaml)) points at one branch through `spec.source.targetRevision`. The two environments can therefore differ in storage, image registry and traffic routing while sharing the same application code.
@@ -153,7 +153,7 @@ kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.pas
 
 ## Helm Chart and IAM Least Privilege
 
-The application is packaged as a Helm chart in [`helm/faraja/`](helm/faraja) with one values file per environment (`values-minikube.yaml`, `values-eks.yaml`). ArgoCD renders the chart with `values-eks.yaml`; Jenkins lints and schema-checks it, then commits new image tags. See [`docs/helm.md`](docs/helm.md).
+The application is packaged as a Helm chart in [`helm/faraja/`](helm/faraja) with one values file per environment (`values-minikube.yaml`, `values-eks.yaml`). ArgoCD renders the chart with `values-eks.yaml`; Jenkins lints and schema-checks it, then commits new image tags. See [`docs/helm.md`](docs/helm.md). On the demo cluster the Gateway runs HTTP-only (`gateway.tlsEnabled: false`) until DNS and cert-manager are in place; the load balancer address serves the app and Grafana (`/grafana/`).
 
 IAM follows least privilege: pull-only node role scoped to the Faraja repositories, VPC CNI permissions through IRSA, a restricted Jenkins user, a scoped Terraform deployer policy with a permission boundary, and an ArgoCD AppProject. See [`docs/iam.md`](docs/iam.md).
 

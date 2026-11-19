@@ -2,7 +2,7 @@
 
 | Identity | Before | Now | Why |
 |---|---|---|---|
-| Worker node role | `AmazonEC2ContainerRegistryReadOnly` (every repo in the account) + CNI policy | Inline policy: pull only from the 2 Faraja repos; CNI policy removed | Pods that reach the node's credentials can't read other images or touch the VPC |
+| Worker node role | `AmazonEC2ContainerRegistryReadOnly` (every repo in the account) + CNI policy | Inline policy: pull only from the 2 Faraja repos plus AWS's EKS system-image registry; CNI policy removed | Pods that reach the node's credentials can't read other images or touch the VPC |
 | `aws-node` (VPC CNI) | Used the node role | Own IRSA role (`faraja-cluster-vpc-cni-role`) bound to `kube-system:aws-node` | Only the CNI pod gets network permissions |
 | EBS CSI driver | IRSA role (already scoped) | unchanged | Already least privilege |
 | `jenkins-ci` user | Push to 2 repos | Same, plus optional `aws:SourceIp` restriction (`jenkins_allowed_source_cidrs`) | Stolen keys are useless from another network |
@@ -21,6 +21,9 @@ Then the stack is applied with `-var permissions_boundary_arn=<boundary arn>`.
 - `aws iam simulate-principal-policy` against the node role: `ecr:BatchGetImage` on another repo = denied.
 - IAM Access Analyzer: no findings for external access.
 - Fallback if CNI over IRSA misbehaves: `-var cni_via_irsa=false`.
+
+## Lesson learned: scoping node ECR pulls
+EKS runs `kube-proxy`, `vpc-cni`, `coredns` and the pause image from AWS's own registry (account `602401143452`). When the node role was first limited to the 2 Faraja repositories, the nodes could not pull those images, stayed `NotReady` with `ImagePullBackOff`, and the node group failed after about 45 minutes. The inline policy now also allows read-only pulls from `arn:aws:ecr:*:602401143452:repository/*`. To diagnose: `kubectl describe pod -n kube-system <pod>` and look for a pull error against that registry.
 
 ## Known gaps (honest list)
 - `jenkins-ci` still uses long-lived access keys (rotate every 90 days); moving Jenkins to short-lived credentials is the next step.
