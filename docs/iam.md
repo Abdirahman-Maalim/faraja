@@ -6,7 +6,7 @@
 | `aws-node` (VPC CNI) | Used the node role | Own IRSA role (`faraja-cluster-vpc-cni-role`) bound to `kube-system:aws-node` | Only the CNI pod gets network permissions |
 | EBS CSI driver | IRSA role (already scoped) | unchanged | Already least privilege |
 | `jenkins-ci` user | Push to 2 repos | Same, plus optional `aws:SourceIp` restriction (`jenkins_allowed_source_cidrs`) | Stolen keys are useless from another network |
-| Person running Terraform | Needs AdministratorAccess | `terraform/iam-deployer`: scoped policy + permission boundary | Admin in the account is not required; created roles can't escalate |
+| Person running Terraform | Needs AdministratorAccess | `terraform/iam-deployer`: scoped policy + permission boundary; `AdministratorAccess` removed from the `DevOps` group | Admin in the account is not required; created roles can't escalate |
 | ArgoCD app | `default` project (any repo, any namespace) | `faraja` AppProject: one repo, one namespace, 2 cluster kinds | Limits blast radius of a bad commit |
 
 ## Deployer policy and boundary
@@ -27,7 +27,8 @@ EKS runs `kube-proxy`, `vpc-cni`, `coredns` and the pause image from AWS's own r
 
 ## Known gaps (honest list)
 - `jenkins-ci` still uses long-lived access keys (rotate every 90 days); moving Jenkins to short-lived credentials is the next step.
-- Not yet tested against a live account: the deployer policy and boundary may need one iteration (apply, read the AccessDenied, adjust).
+- Verified on a live account: with `AdministratorAccess` removed, the `DevOps` user can still run `terraform plan` (including `plan -destroy`), reach the cluster and read ECR, while `iam:CreateUser` and EC2 in another region are denied. Create and destroy through the scoped policy are exercised at teardown; any `AccessDenied` is fixed by an admin in `terraform/iam-deployer`.
+- Break-glass: a separate console-only admin user with MFA and no access keys can change IAM. The day-to-day `DevOps` user cannot, so `terraform/iam-deployer` itself must be applied by that admin.
 - Kubernetes ServiceAccount token hardening and namespace RBAC for people are not done yet.
 
 ## Terraform init in any account
