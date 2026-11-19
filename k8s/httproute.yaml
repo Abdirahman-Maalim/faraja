@@ -6,7 +6,7 @@ metadata:
 spec:
   parentRefs:
     - name: faraja-gateway
-      sectionName: https
+      sectionName: http
   rules:
     - matches:
         - path:
